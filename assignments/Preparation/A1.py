@@ -7,7 +7,8 @@ if __name__ == "__main__":
     
     # Explore the loaded pandas dataframe
     # Print out the 20th training data point
-    print(data_train.loc[20])
+    print(data_train.loc[12])
+    print("wassup")
     # Print out the column "Species"
     print(data_train["Species"])
     # Print out the data points with "Species" == "Iris-setosa"
