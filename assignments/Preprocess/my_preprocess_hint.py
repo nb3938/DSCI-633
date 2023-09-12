@@ -53,15 +53,23 @@ class my_normalizer:
         # Calculate the offset and scaler for input vector x
         if self.norm == "Min-Max":
             # Write your own code below
+            offset= np.min(x)
+            scaler= np.max(x)- np.min(x)
 
         elif self.norm == "L1":
             # Write your own code below
+            offset = 0
+            scaler= np.sum(np.abs(x))
 
         elif self.norm == "L2":
             # Write your own code below
+            offset=0
+            sclaer= np.sqrt(np.sum(x**2))
 
         elif self.norm == "Standard_Score":
             # Write your own code below
+            offset= np.mean(x)
+            scaler= np.std(x)
 
         else:
             raise Exception("Unknown normlization.")
@@ -80,6 +88,9 @@ class my_pca:
         #     self.principal_components: the top n_components principal_components
         U, s, Vh = svd(X)
         # Write your own code below
+        Vhtrans= Vh.T
+        self.principal_components= Vhtrans[:, :self.n_components]
+
 
 
     def transform(self, X):
@@ -106,6 +117,13 @@ def stratified_sampling(y, ratio, replace = True):
         raise Exception("ratio must be 0 < ratio < 1.")
     y_array = np.asarray(y)
     # Write your own code below
+    uniq_classes, class_counts= np.unique(y_array, return_counts=True)
+    sample_indices=[]
+    for clas in uniq_classes:
+        class_indices= np.where(y_array==clas)[0]
+        num_samples= int(np.ceil(ratio* len(class_indices)))
+        sample_indices.extend(np.random.choice(class_indices, size=num_samples, replace=True))
+    return sample_indices    
 
 
     return sample.astype(int)
