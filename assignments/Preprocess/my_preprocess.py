@@ -87,6 +87,7 @@ class my_pca:
         #     self.principal_components: the top n_components principal_components
         U, s, Vh = svd(X)
         # Write your own code below
+        
         Vhtrans= Vh.T
         self.principal_components= Vhtrans[:, :self.n_components]
 
