@@ -21,12 +21,20 @@ class my_NB:
         # self.P[yj][Xi][xi] = P(xi|yj) where Xi is the feature name and xi is the feature value, yj is a specific class label
         # make sure to use self.alpha in the __init__() function as the smoothing factor when calculating P(xi|yj)
         self.P = {}
+        for label in self.classes_:
+            if label not in self.p:
+                self.P[label] = {}
+            for feature in X:
+                count= np.count_nonzero(X[feature][y==label])
+                counter= Counter(X[feature][y==label])
+                self.P[label][feature]={}
+                nof_unique_feature= len(list(set(X[feature])))
 
-
-
-
-
-        
+                for temp in X[feature]:
+                    if counter.get(temp)==None:
+                        self.P[label][feature][temp]= self.alpha/(count+ (nof_unique_feature* self.alpha))
+                    else:
+                        self.P[label][feature][temp]= (counter.get(temp)+ self.alpha)/ (count+(nof_unique_feature*self.alpha))
         return
 
     def predict_proba(self, X):
@@ -51,7 +59,8 @@ class my_NB:
         # return predictions: list
         # Hint: predicted class is the class with highest prediction probability (from self.predict_proba)
         probs = self.predict_proba(X)
-        predictions = "Write your own code"
+        pred= np.argmax(probs, axis=1)
+        predictions = pred.tolist();
         return predictions
 
 
