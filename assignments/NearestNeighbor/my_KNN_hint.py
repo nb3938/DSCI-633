@@ -25,19 +25,29 @@ class my_KNN:
         # Calculate distances of training data to a single input data point (distances from self.X to x)
         # Output np.array([distances to x])
         if self.metric == "minkowski":
-            distances = "write your own code"
+            distances = np.sum(np.abs(self.X - x) ** self.p, axis=1) ** (1 / self.p)
 
 
         elif self.metric == "euclidean":
-            distances = "write your own code"
+            self.p = 2
+            distances = np.sum(np.abs(self.X - x) ** self.p, axis=1) ** (1 / self.p)
 
 
         elif self.metric == "manhattan":
-            distances = "write your own code"
+            self.p = 1
+            distances = np.sum(np.abs(self.X - x) ** self.p, axis=1) ** (1 / self.p)
 
 
         elif self.metric == "cosine":
-            distances = "write your own code"
+            distances = 1 - np.sum(self.X * x, axis=1) / (
+                    np.sqrt(np.sum(self.X ** 2, axis=1)) * np.sqrt(np.sum(x ** 2))
+            )
+
+        elif self.metric == "weighted_euclidean":
+                 # Calculate the weighted distances
+            distances = np.sum(
+                np.abs(self.X - x) ** self.p * self.weights, axis=1
+            ) ** (1 / self.p)
 
 
         else:
@@ -48,10 +58,12 @@ class my_KNN:
         # Return the stats of the labels of k nearest neighbors to a single input data point (np.array)
         # Output: Counter(labels of the self.n_neighbors nearest neighbors) e.g. {"Class A":3, "Class B":2}
         distances = self.dist(x)
-        output = "write your own code"
-
-
-
+        sorteddist = np.argsort(distances)
+        Bestdistances = sorteddist[:self.n_neighbors]
+        Labels =[]
+        for label in Bestdistances:
+              Labels.append(self.y[label])
+        output = Counter(Labels)
         return output
 
     def predict(self, X):
@@ -69,15 +81,18 @@ class my_KNN:
         try:
             X_feature = X[self.X.columns]
         except:
-            raise Exception("Input data mismatch.")
-
-        for x in X_feature.to_numpy():
-            neighbors = self.k_neighbors(x)
-            # Calculate the probability of data point x belonging to each class
-            # e.g. prob = {"2": 1/3, "1": 2/3}
-            prob = {"write your own code"}
-            probs.append(prob)
+            raise Exception("Data Mismatch.")
+        for val in X_feature.to_numpy():
+                neighbors = self.k_neighbors(val)
+                # Calculate the probability of data point x belonging to each class
+                # e.g. prob = {"2": 1/3, "1": 2/3}
+                prob = {}
+                for x in neighbors:
+                    prob[x] = neighbors[x] / self.n_neighbors
+                probs.append(prob)
+                # print(probs)
         probs = pd.DataFrame(probs, columns=self.classes_)
+        probs = probs.replace(np.nan, 0)
         return probs
 
 
