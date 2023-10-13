@@ -1,3 +1,5 @@
+
+
 import pandas as pd
 import numpy as np
 from collections import Counter
@@ -22,18 +24,18 @@ class my_DT:
         # Input is a list (or np.array) of labels
         # Output impurity score
         stats = Counter(labels)
-        N = float(len(labels))
+        count_y = float(sum(stats.values()))
         if self.criterion == "gini":
             # Implement gini impurity
-
-
-
+            impure = 1
+            for val in stats:
+                impure = impure - ((stats[ val ] / count_y) ** 2)
 
         elif self.criterion == "entropy":
             # Implement entropy impurity
-
-
-
+            impure = 0
+            for val in stats:
+                impure = impure - ((stats[ val ] / count_y) * np.log2(stats[ val ] / count_y))
 
         else:
             raise Exception("Unknown criterion.")
@@ -50,10 +52,32 @@ class my_DT:
         best_feature = None
         for feature in X.keys():
             cans = np.array(X[feature][pop])
+            cans_sorted = np.argsort(cans)
+            [imp, impures]= self.find_best_node([], [], cans, labels, cans_sorted, pop,len(cans_sorted))
+            min_impures= np.min(impures)
 
+            if min_impures<np.inf and (best_feature==None or best_feature[1]> min_impures):
+                fet= np.argmin(impures)
+                best_feature= (feature, min_impures, (cans[cans_sorted][fet]+ cans[cans_sorted][fet+1])/2.0, [pop[cans_sorted[:fet+1]], pop[cans_sorted[fet+1:]]], imp[fet])
 
 
         return best_feature
+
+    def find_best_node(self, imp, impures, cans, labels, cans_sorted, pop, n ):
+        for i in range(n-1):
+            imp.append([] if cans[cans_sorted[i]] == cans[cans_sorted[i+1]] else [self.gini(labels[pop[cans_sorted[:i+1]]])*(i+1),(n-i-1)* self.gini(labels[pop[cans_sorted[i+1:]]])])
+            impures.append(np.inf if cans[cans_sorted[i]]== cans[cans_sorted[i+1]] else np.sum(imp[-1]))
+        return [imp, impures]
+
+
+    def gini(selfself, labels):
+        a= Counter(labels)
+        n= float(len(labels))
+        impures= 1
+        for i in a:
+            impures-= (a[i]/ n)**2
+
+        return impures
 
     def fit(self, X, y):
         # X: pd.DataFrame, independent variables, float
@@ -136,7 +160,10 @@ class my_DT:
                 if type(self.tree[node]) == Counter:               
                     # Calculate prediction probabilities for data point arriving at the leaf node.
                     # predictions = list of prob, e.g. prob = {"2": 1/3, "1": 2/3}
-                    prob = {"write your own code"}
+                    prob = {}
+                    total = sum(self.tree[ node ].values())
+                    for val in self.classes_:
+                        prob[ val ] = self.tree[ node ][ val ] / total
                     predictions.append(prob)
                     break
                 else:
