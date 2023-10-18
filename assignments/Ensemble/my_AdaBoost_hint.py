@@ -52,10 +52,13 @@ class my_AdaBoost:
                 self.estimators = [self.estimators[i]]
                 break
             # Compute alpha for estimator i (don't forget to use k for multi-class)
-            self.alpha.append("write your own code")
-
-            # Update wi
-            w = "write your own code"
+            self.alpha.append((np.log(1 - 1.0 / k)) + (np.log((1 - error) / (error + 1e-10))))
+            for i in range(len(diffs)):
+                if diffs[i]:
+                    w[i] = (w[i] * np.exp(self.alpha[ -1 ]))
+                else:
+                    w[i] = w[i]
+            w = (w / np.sum(w))
 
         # Normalize alpha
         self.alpha = self.alpha / np.sum(self.alpha)
@@ -78,7 +81,10 @@ class my_AdaBoost:
         probs = {}
         for label in self.classes_:
             # Calculate probs for each label
-            "write your own code"
+            new = []
+            for i in range(len(self.alpha)):
+                new.append(self.alpha[i] * (self.estimators[i].predict(X) == label))
+                probs[label] = np.sum(new, axis=0)
 
 
 
