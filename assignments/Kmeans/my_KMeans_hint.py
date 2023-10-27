@@ -1,3 +1,5 @@
+import sys
+
 import pandas as pd
 import numpy as np
 from pdb import set_trace
@@ -30,12 +32,33 @@ class my_KMeans:
         # Output cluster_centers (list)
 
         if self.init == "random":
-
-            cluster_centers = "write your own code"
+            np.random.RandomState(self.max_iter)
+            random_idx = np.random.permutation(X.shape[ 0 ])
+            cluster_centers = X[random_idx[:self.n_clusters]]
 
         elif self.init == "k-means++":
 
-            cluster_centers = "write your own code"
+            final_cluster_data =[]
+            random_initial_index = np.random.choice(X.shape[0], 1, replace=False)
+            random_initial_center = X[random_initial_index]
+
+            for i in range(len(random_initial_index)):
+                final_cluster_data.append(random_initial_center[i])
+
+            min_distance_index = 0
+            kdist_indices = list()
+
+            for i in range(self.n_clusters - 1):
+                kdistances = [np.min([ self.dist(x, j) for j in final_cluster_data ]) ** 2 for x in X ]
+                min_probabilities = kdistances / np.sum(kdistances)
+                min_distance_index = np.random.choice(X.shape[0], 1, p=min_probabilities)
+                kdist_indices.append(min_distance_index)
+
+            for i in kdist_indices:
+                final_cluster_data.extend(list(X[i]))
+
+            cluster_centers = final_cluster_data
+
 
         else:
             raise Exception("Unknown value of self.init.")
@@ -58,9 +81,9 @@ class my_KMeans:
                 # calculate distances between x and each cluster center
                 dists = [self.dist(x, center) for center in cluster_centers]
                 # calculate inertia
-                inertia += "write your own code"
+                inertia += min(dists)*min(dists)
                 # find the cluster that x belongs to
-                cluster_id = "write your own code"
+                cluster_id = np.argmin(dists)
                 # add x to that cluster
                 clusters[cluster_id].append(x)
 
@@ -68,7 +91,9 @@ class my_KMeans:
                 break
             # Update cluster centers
 
-            cluster_centers = "Write your own code"
+            for clus_id, cluster in enumerate(clusters):
+                clus_mean = np.mean(cluster, axis=0)
+                cluster_centers[clus_id] = clus_mean
 
             last_inertia = inertia
 
