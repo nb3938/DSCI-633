@@ -36,10 +36,29 @@ class my_Logistic:
 
     def generate_batches(self, n):
         # write your code below
+        batches = [ ]
+        if self.shuffle:
+            indices = np.random.permutation(n)
+        else:
+            indices = np.arange(n)
+
+        for i in range(0, n, self.batch_size):
+            batch = indices[ i:i + self.batch_size ]
+            batches.append(batch)
+
         return batches
 
     def sgd(self, X, y, w, w0):
         # write your code below
+        y_hat = self.predict(X)
+
+        # Compute the gradients
+        dw = np.mean((y_hat - y) * X, axis=0)
+        dw0 = np.mean(y_hat - y)
+
+        # Update the weights
+        w -= self.learning_rate * dw
+        w0 -= self.learning_rate * dw0
         return w, w0
 
 
