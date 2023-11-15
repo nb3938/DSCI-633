@@ -83,8 +83,8 @@ class my_GA:
             for fold in range(self.crossval_fold):
                 start = int(fold * size)
                 end = start + size
-                test_indices = indices["write your own code"]
-                train_indices = indices["write your own code"] + indices["write your own code"]
+                test_indices = indices[start:end]
+                train_indices = indices[:start] + indices[end:]
                 X_train = self.data_X.loc[train_indices]
                 X_train.index = range(len(X_train))
                 X_test = self.data_X.loc[test_indices]
@@ -94,17 +94,17 @@ class my_GA:
                 y_test = self.data_y.loc[test_indices]
                 y_test.index = range(len(y_test))
                 clf.fit(X_train, y_train)
-                predictions = "write your own code"
+                predictions =clf.predict(X_test)
                 try:
-                    pred_proba = "write your own code"
+                    pred_proba = clf.predict_proba(X_test)
                 except:
                     pred_proba = None
-                actuals = "write your own code"
+                actuals = y_test
                 objs = np.array(self.obj_func(predictions, actuals, pred_proba))
                 objs_crossval.append(objs)
+                objs_crossval = np.mean(np.array(objs_crossval), axis=0)
             # Take a mean of each fold of the cross validation result
             # objs_crossval should become an 1-d array of the same size as objs
-            objs_crossval = "write your own code"
             self.evaluated[decision] = objs_crossval
         return self.evaluated[decision]
 
@@ -118,10 +118,11 @@ class my_GA:
         obj_a = self.evaluate(a)
         obj_b = self.evaluate(b)
         # write your own code below
-        if "write your own code":
-            return 1
-        else:
-            return -1
+        for i in range(len(obj_a) - 1):
+            if ((obj_a[i+1] > obj_b[i+1]) and (obj_a[i] > obj_b[i])):
+                return 1
+            else:
+                return -1
 
     def compete(self, pf_new, pf_best):
         # Compare and merge two pareto frontiers
@@ -136,7 +137,7 @@ class my_GA:
         modified = False
         for i in range(len(pf_best)):
             for j in range(len(pf_new)):
-                if "write your own code":
+                if self.is_better(pf_new[j], pf_best[i]) == 1:
                     pf_best[i] = pf_new[j]
                     pf_new.pop(j)
                     modified = True
@@ -145,7 +146,7 @@ class my_GA:
         for j in range(len(pf_new)):
             not_dominated = True
             for i in range(len(pf_best)):
-                if "write your own code":
+                if self.is_better(pf_best[i], pf_new[j]) != -1:
                     not_dominated = False
                     break
             if not_dominated:
@@ -195,7 +196,8 @@ class my_GA:
         def cross(a, b):
             new_point = []
             for i in range(len(a)):
-                if "write your own code":
+                selectRandom = np.random.randint(0, 2)
+                if selectRandom == 0:
                     new_point.append(a[i])
                 else:
                     new_point.append(b[i])
@@ -227,12 +229,12 @@ class my_GA:
                 if np.random.random() < self.mutation_rate:
                     boundary = self.decision_boundary[j]
                     if type(boundary) == list:
-                        val = "write your own code"
+                        val = np.random.random() * (boundary[1] - boundary[0]) + boundary[0]
                         if type(boundary[0]) == int:
                             val = round(val)
                         new_x[j] = val
                     else:
-                        new_x[j] = "write your own code"
+                        new_x[j] = boundary[np.random.randint(len(boundary))]
             self.generation[i] = tuple(new_x)
         return self.generation
 
