@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 from pdb import set_trace
 from project import my_model
 sys.path.insert(0, '../..')
-from assignments.assignment8.my_evaluation import my_evaluation
+from assignments.Evaluation.my_evaluation import my_evaluation
 
 def test(data):
     y = data["fraudulent"]
@@ -28,4 +28,4 @@ if __name__ == "__main__":
     f1 = test(data)
     print("F1 score: %f" % f1)
     runtime = (time.time() - start) / 60.0
-    print(runtime)
+    print(round(runtime, 2))
