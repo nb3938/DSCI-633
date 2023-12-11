@@ -119,11 +119,10 @@ class my_GA:
         obj_a = self.evaluate(a)
         obj_b = self.evaluate(b)
         # write your own code below
-        for i in range(len(obj_a) - 1):
-            if ((obj_a[i+1] > obj_b[i+1]) and (obj_a[i] > obj_b[i])):
-                return 1
-            else:
-                return -1
+        if (obj_a >= obj_b).all() & (obj_a > obj_b).any():
+            return 1
+        else:
+            return -1
 
     def compete(self, pf_new, pf_best):
         # Compare and merge two pareto frontiers
