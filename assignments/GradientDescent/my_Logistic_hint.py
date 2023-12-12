@@ -33,7 +33,6 @@ class my_Logistic:
                 # Update weights
                 self.w, self.w0 = self.sgd(X_train, y_train, self.w, self.w0)
 
-
     def generate_batches(self, n):
         # write your code below
         batches = [ ]
@@ -41,9 +40,8 @@ class my_Logistic:
             indices = np.random.permutation(n)
         else:
             indices = np.arange(n)
-
         for i in range(0, n, self.batch_size):
-            batch = indices[ i:i + self.batch_size ]
+            batch = indices[i:i + self.batch_size]
             batches.append(batch)
 
         return batches
